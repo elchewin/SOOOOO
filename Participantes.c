@@ -5,13 +5,13 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 
+int main()
+{
+    // Abre el FIFO
+    int fd = open("myfifo", O_RDWR);
 
-
-int main() {
-    // Abre el FIFO en modo de escritura
-    int fd = open("myfifo", O_WRONLY);
-
-    if (fd == -1) {
+    if (fd == -1)
+    {
         perror("Error al abrir el FIFO");
         exit(EXIT_FAILURE);
     }

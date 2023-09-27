@@ -6,10 +6,19 @@
 #include <fcntl.h>
 #include <errno.h>
 
-int main(int argc, char *argv[])
+int main()
 {
     // creacion del FIFO
-    if (mkfifo("myfifo", 0777) == -1)
+    if (mkfifo("/tmp/lectura", 0777) == -1)
+    {
+        if (errno != EEXIST)
+        {
+            printf("No se pudo crear FIFO\n");
+            return 1;
+        }
+    }
+    // creacion del FIFO
+    if (mkfifo("/tmp/escritura", 0777) == -1)
     {
         if (errno != EEXIST)
         {
@@ -22,23 +31,22 @@ int main(int argc, char *argv[])
     printf("Ingrese el número de participantes: ");
     scanf("%d", &num_participantes);
 
-    // Abre el FIFO en modo de lectura no bloqueante
-    int fd = open("myfifo", O_RDWR | O_NONBLOCK);
-    printf("Esperando que se conecten %d participantes...\n", num_participantes);
+    // Abre el FIFO (lectura)
+    int fdR = open("/tmp/rw", O_RDONLY);
+
+    int buf, num_participantes_t = num_participantes;
 
     // Espera a que se conecten todos los participantes
-    while (1)
+    while (num_participantes_t != 0)
     {
-        if (num_participantes == 0)
-        {
-            printf("¡Todos los participantes están conectados!\n");
-            break;
-        }
+        read(fdR, buf, sizeof(buf));
+        printf("Esperando que se conecten %d participantes...\n", num_participantes_t);
+        buf -= num_participantes_t;
         sleep(1); // Puedes ajustar este valor según tus necesidades
     }
-
+    printf("¡Todos los participantes están conectados!\n");
     // Cierra el FIFO
-    close(fd);
+    close(fdR);
 
     return 0;
 }
