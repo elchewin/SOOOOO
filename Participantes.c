@@ -7,20 +7,25 @@
 
 int main()
 {
-    // Abre el FIFO
-    int fd = open("myfifo", O_RDWR);
+    int buf;
 
-    if (fd == -1)
-    {
-        perror("Error al abrir el FIFO");
-        exit(EXIT_FAILURE);
-    }
+    // Proceso lectura
+    int fdR = open("/output/FIFO", O_RDONLY);
 
+    read(fdR, buf, sizeof(buf));
+
+    printf("hay %d jugadores conectados antes que yo\n", buf);
+
+    close(fdR);
+
+    // Proceso Escritura
+    int fdW = open("/output/FIFO", O_WRONLY);
+    buf++;
+    write(fdW, buf, sizeof(buf));
     // Notifica que el participante está listo
-    printf("Participante conectado.\n");
+    printf("Participante conectado nª %d.\n", buf);
 
-    // Cierra el FIFO
-    close(fd);
+    close(fdW);
 
     return 0;
 }
